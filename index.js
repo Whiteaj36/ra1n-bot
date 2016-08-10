@@ -4,6 +4,7 @@ var Auth = require("./auth.json");
 var https = require('https');
 var Spotify = require('spotify-web-api-node');
 var Auth = require('./auth.json');
+var exec = require('child_process').exec;
 
 // credentials are optional
 var spotifyApi = new Spotify({
@@ -58,15 +59,39 @@ bot.on("message", function(msg, suffix) {
       .then(function(data) {
           bot.sendMessage(msg, data.body.tracks.items[0].external_urls
             .spotify);
-          console.log('Search by ' + search, data.body.tracks.items[
-              0].external_urls
-            .spotify);
+          //bot.sendTTSMessage(msg, search);
+
+          console.log('Search by ' + search, data.body.tracks);
         },
         function(err) {
           console.error(err);
         });
 
   }
+
+  if (msg.content.startsWith("!help")) {
+    bot.sendMessage(msg, "ping, roll, spotify");
+  }
+
+  if (msg.content.indexOf(bot.user.mention()) > -1) {
+    var responses = ["what", "fuck you", "hey man", "yes?"];
+
+
+    bot.sendMessage(msg.channel, responses[Math.floor(Math.random() *
+      responses.length + 1)]);
+  }
+
+  //fun stuff but dangerous
+  // if (msg.content.startsWith("!cmd")) {
+  //   var cmd = msg.cleanContent.replace('!cmd ', '');
+  //   console.log(cmd);
+  //   if (cmd === 'pwd' || cmd.indexOf('ls') == 0) {
+  //     exec(cmd, function(error, stdout,
+  //       stderr) {
+  //       bot.sendMessage(msg, stdout);
+  //     });
+  //   }
+  // }
 });
 
 //Log user status changes
