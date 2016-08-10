@@ -1,6 +1,15 @@
 const Discord = require('discord.js');
 const d20 = require('d20');
 var Auth = require("./auth.json");
+var https = require('https');
+var Spotify = require('spotify-web-api-node');
+var Auth = require('./auth.json');
+
+// credentials are optional
+var spotifyApi = new Spotify({
+  clientId: Auth.spotify.clientId,
+  clientSecret: Auth.spotify.clientSecret
+});
 
 var bot = new Discord.Client();
 
@@ -42,6 +51,22 @@ bot.on("message", function(msg, suffix) {
     var channel = bot.channels.get('name', 'general');
     bot.setChannelTopic(channel, msg.cleanContent.replace('/topic ', ''));
   }
+
+  if (msg.content.startsWith("!spotify")) {
+    var search = msg.cleanContent.replace('!spotify ', '');
+    spotifyApi.searchTracks(search)
+      .then(function(data) {
+          bot.sendMessage(msg, data.body.tracks.items[0].external_urls
+            .spotify);
+          console.log('Search by ' + search, data.body.tracks.items[
+              0].external_urls
+            .spotify);
+        },
+        function(err) {
+          console.error(err);
+        });
+
+  }
 });
 
 //Log user status changes
@@ -52,7 +77,7 @@ bot.on("presence", function(user, status, gameId) {
   //}
   try {
     console.log("status for " + user.username + ": " + status.status);
-    var channel = bot.channels.get("name", "general");
+    var channel = bot.channels.get("name", "bot-dev");
     if (status.game != null) {
       bot.sendMessage(channel, user.username + " started playing " + status
         .game.name);
@@ -63,4 +88,4 @@ bot.on("presence", function(user, status, gameId) {
   } catch (e) {}
 });
 
-bot.loginWithToken(Auth.api_key);
+bot.loginWithToken(Auth.discord.api_key);
