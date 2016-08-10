@@ -5,12 +5,12 @@ var Auth = require("./auth.json");
 var bot = new Discord.Client();
 
 //when the bot is ready
-bot.on("ready", () => {
+bot.on("ready", function() {
   console.log(`Ready to begin! Serving in ${bot.channels.length} channels`);
 });
 
 //when the bot disconnects
-bot.on("disconnected", () => {
+bot.on("disconnected", function() {
   //alert the console
   console.log("Disconnected!");
 
@@ -19,7 +19,7 @@ bot.on("disconnected", () => {
 });
 
 //when the bot receives a message
-bot.on("message", (msg, suffix) => {
+bot.on("message", function(msg, suffix) {
   //if message begins with "ping"
   if (msg.content.startsWith("!ping")) {
     //send a message to the channel the ping message was sent in.
