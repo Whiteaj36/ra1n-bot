@@ -83,8 +83,7 @@ bot.on("message", function (msg, suffix) {
             responses.length + 1)]);
     }
 
-    if (msg.content.indexOf(bot.user.mention()) == 0 && msg.content.split(" ")[
-            1] == 'suh dude') {
+    if (msg.content.indexOf(bot.user.mention()) == 0 && msg.content.replace(bot.user.mention() + " ", '') == 'suh dude') {
         var responses = ['a-suh', 'suh', 'asuhdue', 'asuhdude', 'suh dude', 'asada'];
 
 
