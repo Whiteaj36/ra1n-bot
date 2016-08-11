@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const d20 = require('d20');
 var Auth = require("./auth.json");
 var https = require('https');
+var http = require("http");
 var Spotify = require('spotify-web-api-node');
 var Auth = require('./auth.json');
 var exec = require('child_process').exec;
@@ -61,7 +62,7 @@ bot.on("message", function(msg, suffix) {
             .spotify);
           //bot.sendTTSMessage(msg, search);
 
-          console.log('Search by ' + search, data.body.tracks);
+          //console.log('Search by ' + search, data.body.tracks);
         },
         function(err) {
           console.error(err);
@@ -73,12 +74,50 @@ bot.on("message", function(msg, suffix) {
     bot.sendMessage(msg, "ping, roll, spotify");
   }
 
-  if (msg.content.indexOf(bot.user.mention()) > -1) {
+  if (msg.content.indexOf(bot.user.mention()) == 0 && msg.content.split(" ")[
+      1] == undefined) {
     var responses = ["what", "fuck you", "hey man", "yes?"];
 
 
     bot.sendMessage(msg.channel, responses[Math.floor(Math.random() *
       responses.length + 1)]);
+  }
+
+  if (msg.content.startsWith("!band")) {
+    var search = msg.cleanContent.replace('!band ', '').replace(/\s/g,
+      '%20');
+    console.log(search);
+    var options = {
+      host: "api.bandsintown.com",
+      path: "/artists/" + search +
+        "/events.json?api_version=2.0&app_id=YOUR_APP_ID"
+    };
+    callback = function(response) {
+      var str = '';
+
+      //another chunk of data has been recieved, so append it to `str`
+      response.on('data', function(chunk) {
+        str += chunk;
+      });
+
+      //the whole response has been recieved, so we just print it out here
+      response.on('end', function() {
+        var dates = '\n';
+
+        var strJson = JSON.parse(str);
+        console.log(strJson);
+        for (var i in strJson) {
+          if (i == 10) {
+            break;
+          }
+          dates += strJson[i].title + " on " + strJson[i].formatted_datetime +
+            "\n";
+        }
+        bot.sendMessage(msg, dates);
+      });
+    }
+
+    http.request(options, callback).end();
   }
 
   //fun stuff but dangerous
@@ -104,7 +143,8 @@ bot.on("presence", function(user, status, gameId) {
     console.log("status for " + user.username + ": " + status.status);
     var channel = bot.channels.get("name", "bot-dev");
     if (status.game != null) {
-      bot.sendMessage(channel, user.username + " started playing " + status
+      bot.sendMessage(channel, user.username + " started playing " +
+        status
         .game.name);
     } else {
       bot.sendMessage(channel, user.username + " went " + status.status);
