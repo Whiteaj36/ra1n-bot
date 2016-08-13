@@ -14,10 +14,10 @@ try {
     var Twitter = require('twitter');
     var GoogleMapsAPI = require('googlemaps');
     var twitterApi = new Twitter({
-      consumer_key: Auth.twitter.consumerKey,
-      consumer_secret: Auth.twitter.consumerSecret,
-      access_token_key: Auth.twitter.atKey,
-      access_token_secret: Auth.twitter.atSecret
+      consumer_key: Auth.twitter.consumer_key,
+      consumer_secret: Auth.twitter.consumer_secret,
+      access_token_key: Auth.twitter.access_token_key,
+      access_token_secret: Auth.twitter.access_token_secret
     });
 
     var mapsConfig = {
