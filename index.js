@@ -222,7 +222,12 @@ bot.on("message", function (msg, suffix) {
         var stringEnd = (msg.content.indexOf(' ') > -1) ? msg.content.indexOf(' ') : msg.content.length;
         var cmd = msg.content.substring(1, stringEnd);
         var action = msg.content.substring(stringEnd + 1, msg.content.length);
-        commands[cmd].execute(bot, msg, action);
+        if (commands[cmd]) {
+            commands[cmd].execute(bot, msg, action);
+        }
+        else {
+            bot.sendMessage(msg.channel, "I don't understand.");
+        }
     }
 
     if (msg.content.indexOf(bot.user.mention()) == 0 && msg.content.split(" ")[
