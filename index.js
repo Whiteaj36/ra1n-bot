@@ -11,6 +11,23 @@ try {
         clientSecret: Auth.spotify.clientSecret
     });
 
+    var Twitter = require('twitter');
+    var GoogleMapsAPI = require('googlemaps');
+    var twitterApi = new Twitter({
+      consumer_key: Auth.twitter.consumerKey,
+      consumer_secret: Auth.twitter.consumerSecret,
+      access_token_key: Auth.twitter.atKey,
+      access_token_secret: Auth.twitter.atSecret
+    });
+
+    var mapsConfig = {
+      key: Auth.googlemaps.KEY,
+      stagger_time:       1000, // for elevationPath
+      encode_polylines:   false,
+      secure:             true, // use https
+    };
+    var gmAPI = new GoogleMapsAPI(mapsConfig);
+
     var exec = require('child_process').exec;
 } catch (e) {
     console.log(e.stack);
@@ -142,13 +159,46 @@ var commands = {
                 //   }
             }
         }
+    },
+    "trending": {
+        description: "See trending topics in your area",
+        execute: function (bot, msg, action) {
+            if (getHelp(action)) {
+                //do something
+            }
+            else {
+                var addressToSearch = msg.cleanContent.replace('!trending ', '');
+                var geocodeParams = {
+                    address: addressToSearch
+                }
+                gmAPI.geocode(geocodeParams, function(err,result){
+                    //console.log("error: " + err);
+                    var location = result.results[0].geometry.location;
+                    var lat = location.lat;
+                    var long = location.lng;
+                    var twitterLocation = {'lat':lat, 'long':long};
+                    twitterApi.get('trends/closest',twitterLocation, function(err,response,raw){
+                        var woeid = {'id':response[0].woeid};
+                        twitterApi.get('trends/place',woeid,function(err,response,raw){
+                            var trendingTopics = "The top 10 trending topics near " + addressToSearch + " are... \n\n";
+                            var i;
+                            for (i = 0; i < 10; i++) {
+                                var listNumeral = i+1;
+                                trendingTopics = trendingTopics + listNumeral + ". " +response[0].trends[i].name + '\n';
+                            } 
+
+                            bot.sendMessage(msg, trendingTopics);
+                        });
+                    });
+                });
+            }
+        }
     }
 };
 
 function getHelp(action) {
     return action.indexOf('--help') > -1;
 }
-
 
 var bot = new Discord.Client();
 

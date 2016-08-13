@@ -6,7 +6,9 @@
   "dependencies": {
     "d20": "^1.4.0",
     "discord.js": "^8.1.0",
-    "spotify-web-api-node": "^2.3.5"
+    "spotify-web-api-node": "^2.3.5",
+    "twitter": "^1.4.0",
+    "googlemaps": "^1.11.1"
   },
   "devDependencies": {},
   "scripts": {
